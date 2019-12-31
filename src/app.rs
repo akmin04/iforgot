@@ -4,7 +4,7 @@ use log::LevelFilter::{Error, Trace};
 
 pub fn init() -> ArgMatches<'static> {
     App::new("iforgot")
-        .version("0.1.0")
+        .version("0.1.1")
         .about("Recall obscure commands by keyword")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .arg(

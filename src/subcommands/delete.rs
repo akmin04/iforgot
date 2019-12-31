@@ -30,8 +30,8 @@ pub fn run(matches: &ArgMatches, commands: &mut Vec<Command>) {
 
         info!("Deleting ID: {}", id);
         commands.remove(id);
-        for i in id..commands.len() {
-            commands[i].id -= 1;
+        for item in commands.iter_mut().skip(id) {
+            item.id -= 1;
         }
     }
 }

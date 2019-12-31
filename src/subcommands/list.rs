@@ -12,7 +12,7 @@ pub fn run(commands: &[Command]) {
     for i in commands {
         println!("{}", i);
         if i.id != last_id {
-            println!("");
+            println!();
         }
     }
 }

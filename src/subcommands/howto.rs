@@ -35,7 +35,7 @@ pub fn run(matches: &ArgMatches, commands: &[Command]) {
     }
 
     if entries.is_empty() {
-        println!("No commands found");
+        println!("{}", "No commands found!".bold().red());
         process::exit(0);
     }
 
@@ -53,36 +53,33 @@ pub fn run(matches: &ArgMatches, commands: &[Command]) {
     loop {
         write!(
             stdout,
-            "\r{}[{}/{}] {} ({}/{}/{}/{})",
+            "\r{}[{}/{}] {} ({} {} {} {})",
             clear::CurrentLine,
             index + 1,
             entries.len(),
             entries[index].0.command,
-            "\u{2192}".bold().green(),
+            "\u{2190}".bold().red(),
             "\u{2191}".bold().blue(),
             "\u{2193}".bold().blue(),
-            "\u{2190}".bold().red()
+            "\u{2192}".bold().green(),
         )
         .unwrap();
         stdout.flush().unwrap();
 
-        match 'key: loop {
-            match io::stdin().keys().nth(0).unwrap().unwrap() {
-                k @ Key::Right | k @ Key::Up | k @ Key::Down | k @ Key::Left => break 'key k,
-                _ => (),
-            }
-        } {
+        match io::stdin().keys().nth(0).unwrap().unwrap() {
             Key::Right => {
-                write!(stdout, "\r\n").unwrap();
-                let split: Vec<&str> = entries[index].0.command.split(" ").collect();
+                writeln!(stdout, "\r").unwrap();
+                let split: Vec<&str> = entries[index].0.command.split(' ').collect();
                 let mut cmd = process::Command::new(split[0]);
-                for i in 1..split.len() {
-                    cmd.arg(split[i]);
+                for item in split.iter().skip(1) {
+                    cmd.arg(item);
                 }
-                cmd.spawn().unwrap().wait().unwrap();
-                write!(stdout, "\r").unwrap();
                 drop(stdout);
-                process::exit(0);
+                info!("Exiting raw mode");
+                info!("Spawning process");
+                cmd.spawn().unwrap().wait().unwrap();
+                print!("\r");
+                break;
             }
             Key::Up => {
                 index = if index == 0 {
@@ -99,9 +96,8 @@ pub fn run(matches: &ArgMatches, commands: &[Command]) {
                 }
             }
             Key::Left => {
-                write!(stdout, "\r\nAborting!\r\n").unwrap();
-                drop(stdout);
-                process::exit(0);
+                write!(stdout, "\r\n{}\r\n", "Aborting!".bold().red()).unwrap();
+                break;
             }
             _ => (),
         }
